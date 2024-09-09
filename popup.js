@@ -16,12 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
               console.log("Retrieved storage items:", items);
               const fullText = `${items.prependText || ''}\n\n${response.emailBody}\n\n${items.appendText || ''}`.trim();
               console.log("Prepared full text:", fullText);
-              chrome.runtime.sendMessage({action: "openChatGPT", fullText: fullText}, (response) => {
-                if (chrome.runtime.lastError) {
-                  console.error("Error sending message to background script:", chrome.runtime.lastError);
-                } else {
-                  console.log("Message sent to background script:", response);
-                }
+              chrome.storage.sync.get(['customGptUrl'], (urlItem) => {
+                chrome.runtime.sendMessage({action: "openChatGPT", fullText: fullText, customUrl: urlItem.customGptUrl}, (response) => {
+                  if (chrome.runtime.lastError) {
+                    console.error("Error sending message to background script:", chrome.runtime.lastError);
+                  } else {
+                    console.log("Message sent to background script:", response);
+                  }
+                });
               });
             });
           } else {

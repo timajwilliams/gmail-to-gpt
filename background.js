@@ -30,7 +30,11 @@ chrome.runtime.onInstalled.addListener(() => {
             console.log("Retrieved storage items:", items);
             const fullText = `${items.prependText}\n\n${response.emailBody}\n\n${items.appendText}`.trim();
             console.log("Prepared full text:", fullText);
-            chrome.tabs.create({url: "https://chatgpt.com/"}, (newTab) => {
+            
+            // Use the customGptUrl from storage, or fall back to the default
+            const url = items.customGptUrl || "https://chatgpt.com/";
+            
+            chrome.tabs.create({url: url}, (newTab) => {
               console.log("Created new tab:", newTab);
               chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
                 if (tabId === newTab.id && info.status === 'complete') {
