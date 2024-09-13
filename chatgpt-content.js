@@ -18,26 +18,14 @@ function waitForElement(selector, timeout = 30000) {
 
 function simulateSend(textarea) {
   return new Promise((resolve, reject) => {
-    // First, try to find and click the send button
     const sendButton = document.querySelector('button[data-testid="send-button"]');
     if (sendButton) {
       sendButton.click();
       console.log("Clicked send button");
       resolve();
     } else {
-      // If button not found, simulate Enter key press
-      console.log("Send button not found, simulating Enter key press");
-      const enterEvent = new KeyboardEvent('keydown', {
-        bubbles: true,
-        cancelable: true,
-        key: 'Enter',
-        code: 'Enter',
-        keyCode: 13,
-        which: 13,
-        shiftKey: false
-      });
-      textarea.dispatchEvent(enterEvent);
-      resolve();
+      console.error("Send button not found");
+      reject(new Error("Send button not found"));
     }
   });
 }
@@ -46,10 +34,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log("Message received in ChatGPT content script:", request);
   if (request.action === "pasteEmail") {
     console.log("Attempting to paste email");
-    waitForElement('textarea')
+    waitForElement('#prompt-textarea')
       .then((textarea) => {
         console.log("Textarea found:", textarea);
-        textarea.value = request.emailBody;
+        
+        // Clear existing content
+        textarea.innerHTML = '';
+        
+        // Create a new paragraph element and set its text content
+        const p = document.createElement('p');
+        p.textContent = request.emailBody;
+        
+        // Append the paragraph to the textarea
+        textarea.appendChild(p);
+        
+        // Dispatch an input event to trigger any necessary updates
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
         console.log("Text pasted into textarea");
         
@@ -73,3 +72,5 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // Indicates that the response is sent asynchronously
   }
 });
+
+console.log("ChatGPT content script loaded");
