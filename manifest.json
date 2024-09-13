@@ -2,6 +2,8 @@
     "manifest_version": 3,
     "name": "Gmail to ChatGPT",
     "version": "1.3",
+    "author": "timajwilliams",
+    "description": "Send your Gmail emails to ChatGPT for summarization, analysis, or any other purpose.",
     "permissions": [
       "activeTab",
       "scripting",
